@@ -1,0 +1,12 @@
+html, body, .measurement{
+    margin: 0;
+    padding: 0;
+    height: 100%;
+}
+
+img{
+      width: 100vw;
+    height: 100vh;
+    display: block;
+    background-color: black; /* 비는 공간 배경색 (선택 사항) */
+}

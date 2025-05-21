@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>나하은 단위 계산기</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 2rem;
+      background: #fafafa;
+      line-height: 1.6;
+    }
+
+    input {
+      padding: 0.5rem;
+      font-size: 1rem;
+      margin: 0.2rem;
+      width: 120px;
+    }
+
+    button {
+      padding: 0.5rem 1rem;
+      font-size: 1rem;
+      margin-top: 1rem;
+    }
+
+    .result {
+      margin-top: 1rem;
+      font-size: 1.2rem;
+      color: #333;
+    }
+
+    #touchArea {
+      height: 300px;
+      background: #e0e0e0;
+      margin-top: 2rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      border: 2px dashed #999;
+    }
+  </style>
+</head>
+<body>
+  <h2>📏 나하은 단위 계산기</h2>
+
+  <div style="display: flex; align-items: center; gap: 1rem;">
+    <img src="./data/한뼘.jpg" alt="나하은의 한 뼘" style="height: 150px;">
+    <div>
+      <p>나하은 님의 한 뼘은 20cm입니다.</p>
+      <p>당신의 한 뼘을 입력하고 비교해보세요!</p>
+    </div>
+  </div>
+
+  <p>1️⃣ 당신의 한 뼘 길이를 입력하세요 (cm):</p>
+  <input type="number" id="userSpan" placeholder="예: 18.5" />
+
+  <p>2️⃣ 비교할 물건의 길이를 입력하세요 (cm):</p>
+  <input type="number" id="objectLength" placeholder="예: 32" />
+
+  <button onclick="calculate()">계산하기</button>
+
+  <div class="result" id="resultBox"></div>
+
+  <!-- 👇 터치 측정 섹션 -->
+  <h3>✋ 한 뼘 직접 측정해보기</h3>
+  <p>스마트폰 화면 위에 손을 올리고<br><strong>시작점 → 끝점</strong> 순서로 두 번 터치하세요.</p>
+  <div id="touchArea">여기를 터치하세요</div>
+  <div class="result" id="touchResult"></div>
+
+  <script>
+    const nahahEunSpan = 20.0; // 기준 한 뼘 (cm)
+
+    function calculate() {
+      const userSpan = parseFloat(document.getElementById("userSpan").value);
+      const objectLength = parseFloat(document.getElementById("objectLength").value);
+      const resultBox = document.getElementById("resultBox");
+
+      if (isNaN(userSpan) || userSpan <= 0) {
+        resultBox.textContent = "유효한 한 뼘 길이를 입력해주세요.";
+        return;
+      }
+
+      let message = "";
+
+      const diff = Math.abs(userSpan - nahahEunSpan).toFixed(1);
+      if (userSpan > nahahEunSpan) {
+        message += `✅ 사용자님의 한 뼘은 나하은 님의 한 뼘보다 ${diff}cm 큽니다.\n`;
+      } else if (userSpan < nahahEunSpan) {
+        message += `✅ 사용자님의 한 뼘은 나하은 님의 한 뼘보다 ${diff}cm 작습니다.\n`;
+      } else {
+        message += `✅ 사용자님의 한 뼘은 나하은 님과 정확히 같습니다.\n`;
+      }
+
+      if (!isNaN(objectLength) && objectLength > 0) {
+        const spanCount = (objectLength / userSpan).toFixed(2);
+        message += `📐 이 물건은 약 ${spanCount} 뼘입니다.`;
+      }
+
+      resultBox.textContent = message;
+    }
+
+    // 👇 터치 기반 측정 기능
+    const touchArea = document.getElementById("touchArea");
+    const touchResult = document.getElementById("touchResult");
+    let firstX = null;
+
+    touchArea.addEventListener("touchstart", (e) => {
+      if (e.touches.length === 1) {
+        const x = e.touches[0].clientX;
+        if (firstX === null) {
+          firstX = x;
+          touchResult.textContent = "✅ 시작점 저장됨! 끝점을 터치하세요.";
+        } else {
+          const secondX = x;
+          const pixelDistance = Math.abs(secondX - firstX);
+
+          const dpi = window.devicePixelRatio * 96;
+          const cmPerPixel = 2.54 / dpi;
+          const spanInCm = (pixelDistance * cmPerPixel).toFixed(1);
+
+          // 자동으로 입력창에 반영
+          document.getElementById("userSpan").value = spanInCm;
+          touchResult.textContent = `📏 측정된 한 뼘 길이: 약 ${spanInCm}cm (자동 입력됨)`;
+
+          firstX = null;
+        }
+      }
+    });
+  </script>
+</body>
+</html>
